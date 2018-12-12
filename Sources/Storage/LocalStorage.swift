@@ -27,7 +27,7 @@ public struct LocalStorage: Storage, ServiceType {
         
         let name = path.last == "/" ? path + file.filename : path + "/" + file.filename
         guard !self.manager.fileExists(atPath: name) else {
-            return self.worker.future(error: StorageError(identifier: "fileExists", reason: "A file already exists at path `\(path)`"))
+            return self.worker.future(error: StorageError(identifier: "fileExists", reason: "A file already exists at path `\(name)`"))
         }
         
         self.manager.createFile(atPath: name, contents: file.data, attributes: [:])
