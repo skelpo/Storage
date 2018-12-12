@@ -7,9 +7,11 @@ let package = Package(
     products: [
         .library(name: "Storage", targets: ["Storage"]),
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/vapor/vapor.git", from: "3.1.0")
+    ],
     targets: [
-        .target(name: "Storage", dependencies: []),
+        .target(name: "Storage", dependencies: ["Vapor"]),
         .testTarget(name: "StorageTests", dependencies: ["Storage"]),
     ]
 )
