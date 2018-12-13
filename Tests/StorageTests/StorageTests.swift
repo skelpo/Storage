@@ -47,7 +47,21 @@ final class StorageTests: XCTestCase {
         try FileManager.default.removeItem(atPath: path)
     }
     
+    func testFetch()throws {
+        let storage = try self.app.make(LocalStorage.self)
+        let f = File(data: self.data, filename: "test.md")
+        let path = try storage.store(file: f, at: self.path).wait()
+        
+        let file = try storage.fetch(file: path).wait()
+        
+        XCTAssertEqual(file.data, self.data)
+        XCTAssertEqual(file.filename, "test.md")
+        
+        try FileManager.default.removeItem(atPath: path)
+    }
+    
     static var allTests: [(String, (StorageTests) -> ()throws -> ())] = [
-        ("testStore", testStore)
+        ("testStore", testStore),
+        ("testFetch", testFetch)
     ]
 }
