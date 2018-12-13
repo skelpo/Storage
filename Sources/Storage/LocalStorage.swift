@@ -125,7 +125,7 @@ public struct LocalStorage: Storage, ServiceType {
             self.manager.createFile(atPath: name, contents: nil, attributes: [:])
             
             // Create a `ByteBuffer` to stream the file data from.
-            let handle = try FileHandle(path: name)
+            let handle = try FileHandle(path: "file:" + name)
             var buffer = self.allocator.buffer(capacity: file.data.count)
             buffer.write(bytes: file.data)
             
@@ -154,7 +154,7 @@ public struct LocalStorage: Storage, ServiceType {
                 throw StorageError(identifier: "fileSize", reason: "Could not determine file size of file `\(file)`.")
             }
             
-            let handle = try FileHandle(path: file)
+            let handle = try FileHandle(path: "file:" + file)
             var fileData = Data()
             fileData.reserveCapacity(fileSize.intValue)
             
@@ -190,7 +190,7 @@ public struct LocalStorage: Storage, ServiceType {
             try self.assert(path: file)
             
             // Create the URL that the data will write to.
-            guard let url = URL(string: "file://" + file) else {
+            guard let url = URL(string: "file:" + file) else {
                 throw StorageError(identifier: "fileURL", reason: "Unable to create a file URL from path `\(file)`")
             }
             
