@@ -122,7 +122,10 @@ public struct LocalStorage: Storage, ServiceType {
             }
             
             // Create an empty file.
-            self.manager.createFile(atPath: name, contents: nil, attributes: [:])
+            let created = self.manager.createFile(atPath: name, contents: nil, attributes: [:])
+            if !created {
+                throw StorageError(identifier: "createFile", reason: "File creation failed.")
+            }
             
             // Create a `ByteBuffer` to stream the file data from.
             let handle = try FileHandle(path: "file:" + name)
