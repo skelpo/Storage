@@ -123,7 +123,7 @@ public struct LocalStorage: Storage, ServiceType {
             
             // Create an empty file.
             let created = self.manager.createFile(atPath: name, contents: nil, attributes: [:])
-            if !created {
+            guard created else {
                 throw StorageError(identifier: "createFile", reason: "File creation failed.")
             }
             
