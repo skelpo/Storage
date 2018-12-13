@@ -121,14 +121,14 @@ public struct LocalStorage: Storage, ServiceType {
                 throw StorageError(identifier: "fileExists", reason: "A file already exists at path `\(name)`")
             }
             
-            // Create an empty file.
-            let created = self.manager.createFile(atPath: name, contents: nil, attributes: [:])
-            guard created else {
-                throw StorageError(identifier: "createFile", reason: "File creation failed.")
+            // Create a new file and a `FileHandle` instance from its descriptor.
+            let fd = open(name, O_RDWR | O_TRUNC | O_CREAT, 0o644)
+            guard fd >= 0 else {
+                throw StorageError(identifier: "fdErr", reason: "Received error code \(fd) when creating the new file")
             }
+            let handle = FileHandle(descriptor: fd)
             
             // Create a `ByteBuffer` to stream the file data from.
-            let handle = try FileHandle(path: "file:" + name)
             var buffer = self.allocator.buffer(capacity: file.data.count)
             buffer.write(bytes: file.data)
             
@@ -157,7 +157,7 @@ public struct LocalStorage: Storage, ServiceType {
                 throw StorageError(identifier: "fileSize", reason: "Could not determine file size of file `\(file)`.")
             }
             
-            let handle = try FileHandle(path: "file:" + file)
+            let handle = try FileHandle(path: file)
             var fileData = Data()
             fileData.reserveCapacity(fileSize.intValue)
             
@@ -193,7 +193,7 @@ public struct LocalStorage: Storage, ServiceType {
             try self.assert(path: file)
             
             // Create the URL that the data will write to.
-            guard let url = URL(string: "file:" + file) else {
+            guard let url = URL(string: file) else {
                 throw StorageError(identifier: "fileURL", reason: "Unable to create a file URL from path `\(file)`")
             }
             
