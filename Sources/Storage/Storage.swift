@@ -11,7 +11,7 @@ public protocol Storage {
     ///
     ///     Some implementations will require a value for this paramter, such as `FileManager`. Others will never need it, like BackBlaze B2.
     ///
-    /// - Returns: The full path to the file, including its name and extension.
+    /// - Returns: The full path to the file, including its name and extension, wrapped in a future.
     func store(file: File, at path: String?) -> EventLoopFuture<String>
     
     /// Gets file data from a path or URL.
@@ -20,4 +20,21 @@ public protocol Storage {
     ///
     /// - Returns: The file's data (name and contents), wrapped in a future.
     func fetch(file: String) -> EventLoopFuture<File>
+    
+    /// Writes new data to a file.
+    ///
+    /// - Parameters:
+    ///   - file: The path or URL of the file to write to.
+    ///   - data: The new data to write to the file.
+    ///   - options: Options to modify how the file is written to. Not all options will be suppoorted by all platforms.
+    ///
+    /// - Returns: The updated file information, wrapped in a future.
+    func write(file: String, with data: Data, options: Data.WritingOptions) -> EventLoopFuture<File>
+    
+    /// Deletes a file.
+    ///
+    /// - Parameter file: The path or URL of the file to delete.
+    ///
+    /// - Returns: A void future that succeedes when the file is deleted.
+    func delete(file: String) -> EventLoopFuture<Void>
 }
