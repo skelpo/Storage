@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+  </head>
+  <body>
+    <a title="  Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="index.html"> Docs</a> (100% documented)</p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="index.html"> Reference</a>
+        <img id="carat" src="img/carat.png" />
+          Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Protocols/Storage.html">Storage</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Structs/LocalStorage.html">LocalStorage</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/StorageError.html">StorageError</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            
+            <h1 id='storage' class='heading'>Storage</h1>
+
+<p>Storage is a generic interface for resource storing APIs, such as Google Cloud Storage, Amazon S3, or your local file system.</p>
+<h2 id='installing' class='heading'>Installing</h2>
+
+<p>Add a package instance to your manifest&rsquo;s <code>dependencies</code> array with the <a href="https://github.com/skelpo/Storage/releases/latest">latest version</a>:</p>
+<pre class="highlight swift"><code><span class="o">.</span><span class="nf">package</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="s">"https://github.com/skelpo/Storage.git"</span><span class="p">,</span> <span class="nv">from</span><span class="p">:</span> <span class="s">"0.1.0"</span><span class="p">)</span>
+</code></pre>
+
+<p>Then run <code>swift package update</code> and regenerate your Xcode project if you have one.</p>
+<h2 id='api' class='heading'>API</h2>
+<h3 id='code-storage-code' class='heading'><code><a href="Protocols/Storage.html">Storage</a></code></h3>
+
+<p>The Storage package is built around the <code><a href="Protocols/Storage.html">Storage</a></code> protocol which defines a type that can create, read, update, and delete files.</p>
+
+<p>It requires 4 methods:</p>
+
+<ul>
+<li><code>func store(file: File, at path: String?) -&gt; EventLoopFuture&lt;String&gt;</code></li>
+<li><code>func fetch(file: String) -&gt; EventLoopFuture&lt;File&gt;</code></li>
+<li><code>func write(file: String, with data: Data, options: Data.WritingOptions) -&gt; EventLoopFuture&lt;File&gt;</code></li>
+<li><code>func delete(file: String) -&gt; EventLoopFuture&lt;Void&gt;</code></li>
+</ul>
+<h3 id='code-storageerror-code' class='heading'><code><a href="Structs/StorageError.html">StorageError</a></code></h3>
+
+<p>If any error occurs in the <code><a href="Protocols/Storage.html">Storage</a></code> methods, a <code><a href="Structs/StorageError.html">StorageError</a></code> is returned in the future. Use this error if you create your own <code><a href="Protocols/Storage.html">Storage</a></code> implementation.</p>
+<h3 id='code-localstorage-code' class='heading'><code><a href="Structs/LocalStorage.html">LocalStorage</a></code></h3>
+
+<p>A <code><a href="Protocols/Storage.html">Storage</a></code> implementation for interacting with files in your local file system. The <code>store</code> and <code>fetch</code> methods stream the file data, while the <code>delete</code> and <code>write</code> methods are run on the instance&rsquo;s event loop.</p>
+
+<p><code><a href="Structs/LocalStorage.html">LocalStorage</a></code> conforms to <code>ServiceType</code>, so you can register it with the rest of your app&rsquo;s services.</p>
+<h2 id='documentation' class='heading'>Documentation</h2>
+
+<p>You can see the API documentation <a href="http://www.skelpo.codes/Storage">here</a>.</p>
+<h2 id='license' class='heading'>License</h2>
+
+<p>This package is registered under the <a href="https://github.com/skelpo/Storage/LICENSE">MIT license agreement</a>.</p>
+
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2018 <a class="link" href="" target="_blank" rel="external"></a>. All rights reserved. (Last updated: 2018-12-13)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.9.1</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>
