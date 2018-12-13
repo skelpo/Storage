@@ -193,7 +193,7 @@ public struct LocalStorage: Storage, ServiceType {
             try self.assert(path: file)
             
             // Create the URL that the data will write to.
-            guard let url = URL(string: file) else {
+            guard let url = URL(string: "file:" + file) else {
                 throw StorageError(identifier: "fileURL", reason: "Unable to create a file URL from path `\(file)`")
             }
             
