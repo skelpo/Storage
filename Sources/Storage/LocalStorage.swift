@@ -66,7 +66,7 @@ public struct LocalStorage: Storage, ServiceType {
     /// The file manager used for checking for a files existance and other validation operations.
     internal let manager: FileManager
     
-    /// The thread pool used to asyncronously write to files. Also used to initialize the `NonBlockingFileIO` instance.
+    /// The thread pool used to asynchronously write to files. Also used to initialize the `NonBlockingFileIO` instance.
     internal let threadPool: BlockingIOThreadPool
     
     /// The file IO interface for creating and reading files.
@@ -141,12 +141,8 @@ public struct LocalStorage: Storage, ServiceType {
     /// See `Storage.fetch(file:)`.
     public func fetch(file: String) -> EventLoopFuture<File> {
         do {
-            
             // Make sure a file exists at the given path.
-            var isDirectory: ObjCBool = false
-            guard self.manager.fileExists(atPath: file, isDirectory: &isDirectory) else {
-                throw StorageError(identifier: "noFile", reason: "Unable to find file at path `\(file)`")
-            }
+            try self.assert(path: file)
             
             // Get the name of the file. This is for the `File` instance that will be returned.
             guard let name = file.split(separator: "/").last.map(String.init) else {
@@ -191,10 +187,7 @@ public struct LocalStorage: Storage, ServiceType {
     public func write(file: String, with data: Data, options: Data.WritingOptions) -> EventLoopFuture<File> {
         do {
             // Make sure a file exists at the given path.
-            var isDirectory: ObjCBool = false
-            guard self.manager.fileExists(atPath: file, isDirectory: &isDirectory) else {
-                throw StorageError(identifier: "noFile", reason: "Unable to find file at path `\(file)`")
-            }
+            try self.assert(path: file)
             
             // Create the URL that the data will write to.
             guard let url = URL(string: "file://" + file) else {
@@ -217,16 +210,22 @@ public struct LocalStorage: Storage, ServiceType {
     public func delete(file: String) -> EventLoopFuture<Void> {
         do {
             // Make sure a file exists at the given path.
-            var isDirectory: ObjCBool = false
-            guard self.manager.fileExists(atPath: file, isDirectory: &isDirectory) else {
-                throw StorageError(identifier: "noFile", reason: "Unable to find file at path `\(file)`")
-            }
+            try self.assert(path: file)
             
+            // Asynchronously
             return self.threadPool.runIfActive(eventLoop: self.worker.eventLoop) {
                 return try self.manager.removeItem(atPath: file)
             }
         } catch let error {
             return self.worker.future(error: error)
+        }
+    }
+    
+    /// Verifies that a file exists at a given path.
+    private func assert(path: String)throws {
+        var isDirectory: ObjCBool = false
+        guard self.manager.fileExists(atPath: path, isDirectory: &isDirectory) else {
+            throw StorageError(identifier: "noFile", reason: "Unable to find file at path `\(path)`")
         }
     }
 }
