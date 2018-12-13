@@ -126,7 +126,7 @@ public struct LocalStorage: Storage, ServiceType {
             
             // Create a `ByteBuffer` to stream the file data from.
             let handle = try FileHandle(path: name)
-            var buffer = self.allocator.buffer(capacity: NonBlockingFileIO.defaultChunkSize)
+            var buffer = self.allocator.buffer(capacity: file.data.count)
             buffer.write(bytes: file.data)
             
             // Stream the file data into the empty file.
