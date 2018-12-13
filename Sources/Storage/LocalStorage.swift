@@ -102,7 +102,7 @@ public struct LocalStorage: Storage, ServiceType {
     }
     
     /// See `Storage.store(file:at:)`.
-    public func store(file: File, at optionalPath: String?) -> EventLoopFuture<String> {
+    public func store(file: File, at optionalPath: String? = nil) -> EventLoopFuture<String> {
         do {
             
             // Get the path that the file will be created at.
@@ -187,7 +187,7 @@ public struct LocalStorage: Storage, ServiceType {
     }
     
     /// See `Storage.write(file:data:options:)`.
-    public func write(file: String, with data: Data, options: Data.WritingOptions) -> EventLoopFuture<File> {
+    public func write(file: String, with data: Data, options: Data.WritingOptions = []) -> EventLoopFuture<File> {
         do {
             // Make sure a file exists at the given path.
             try self.assert(path: file)
