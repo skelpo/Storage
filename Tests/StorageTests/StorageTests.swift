@@ -42,7 +42,7 @@ final class StorageTests: XCTestCase {
         
         let path = try storage.store(file: file, at: self.path).wait()
         
-        XCTAssertEqual(path, self.path + file.filename)
+        XCTAssertEqual(path, self.path + "/" + file.filename)
         
         try FileManager.default.removeItem(atPath: path)
     }
