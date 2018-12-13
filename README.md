@@ -42,4 +42,4 @@ You can see the API documentation [here](http://www.skelpo.codes/Storage).
 
 ## License
 
-This package is registered under the [MIT license agreement](https://github.com/skelpo/Storage/LICENSE).
+This package is registered under the [MIT license agreement](https://github.com/skelpo/Storage/blob/master/LICENSE).
