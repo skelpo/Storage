@@ -102,29 +102,26 @@ public struct LocalStorage: Storage, ServiceType {
     }
     
     /// See `Storage.store(file:at:)`.
-    public func store(file: File, at optionalPath: String?) -> EventLoopFuture<String> {
+    public func store(file: File, at optionalPath: String? = nil) -> EventLoopFuture<String> {
         do {
             
             // Get the path that the file will be created at.
-            let path: String
-            if let unwrappedPath = optionalPath {
-                path = unwrappedPath
-            } else if let defaultPath = self.defaultPath {
-                path = defaultPath
-            } else {
+            let possibleUrl = (optionalPath ?? defaultPath).flatMap { URL(fileURLWithPath: $0) }
+            guard let containingUrl = possibleUrl else {
                 throw StorageError(identifier: "pathRequired", reason: "A path is required to store files locally")
             }
             
-            // Create the path of the file to create, and make sure no file or directory already exists.
-            let name = path.last == "/" ? path + file.filename : path + "/" + file.filename
-            guard !self.manager.fileExists(atPath: name) else {
-                throw StorageError(identifier: "fileExists", reason: "A file already exists at path `\(name)`")
-            }
+            // Create the path of the file to create
+            let name = containingUrl.appendingPathComponent(file.filename).path
             
             // Create a new file and a `FileHandle` instance from its descriptor.
-            let fd = open(name, O_RDWR | O_TRUNC | O_CREAT, 0o644)
+            // The `O_EXCL` flag makes sure the file doesn't already exist.
+            // The `O_CREAT` flag causes the file to be created since it doesn't exist.
+            // The `O_TRUNC` flag removes any data from the file.
+            // The `O_RDWR` flag opens the file to be either written or read.
+            let fd = open(name, O_RDWR | O_TRUNC | O_CREAT | O_EXCL, S_IRWXU | S_IRGRP | S_IROTH)
             guard fd >= 0 else {
-                throw StorageError(identifier: "fdErr", reason: "Received error code \(fd) when creating the new file")
+                throw StorageError(identifier: "errno", reason: "(\(errno))" + String(cString: strerror(errno)))
             }
             let handle = FileHandle(descriptor: fd)
             
@@ -187,7 +184,7 @@ public struct LocalStorage: Storage, ServiceType {
     }
     
     /// See `Storage.write(file:data:options:)`.
-    public func write(file: String, with data: Data, options: Data.WritingOptions) -> EventLoopFuture<File> {
+    public func write(file: String, with data: Data, options: Data.WritingOptions = []) -> EventLoopFuture<File> {
         do {
             // Make sure a file exists at the given path.
             try self.assert(path: file)
