@@ -115,14 +115,12 @@ public struct LocalStorage: Storage, ServiceType {
                 throw StorageError(identifier: "pathRequired", reason: "A path is required to store files locally")
             }
             
-            // Create the path of the file to create, and make sure no file or directory already exists.
+            // Create the path of the file to create
             let name = path.last == "/" ? path + file.filename : path + "/" + file.filename
-            guard !self.manager.fileExists(atPath: name) else {
-                throw StorageError(identifier: "fileExists", reason: "A file already exists at path `\(name)`")
-            }
             
             // Create a new file and a `FileHandle` instance from its descriptor.
-            let fd = open(name, O_RDWR | O_TRUNC | O_CREAT, 0o644)
+            // The `O_EXCL` to make sure the file doesn't already exist.
+            let fd = open(name, O_RDWR | O_TRUNC | O_CREAT | O_EXCL, 0o644)
             guard fd >= 0 else {
                 throw StorageError(identifier: "fdErr", reason: "Received error code \(fd) when creating the new file")
             }
