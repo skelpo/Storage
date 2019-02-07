@@ -118,7 +118,7 @@ public struct LocalStorage: Storage, ServiceType {
             // The `O_EXCL` flag makes sure the file doesn't already exist.
             // The `O_CREAT` flag causes the file to be created since it doesn't exist.
             // The `O_TRUNC` flag removes any data from the file.
-            // The `O_RDWR` flag opens thje file to be either written or read.
+            // The `O_RDWR` flag opens the file to be either written or read.
             let fd = open(name, O_RDWR | O_TRUNC | O_CREAT | O_EXCL, S_IRWXU | S_IRGRP | S_IROTH)
             guard fd >= 0 else {
                 throw StorageError(identifier: "errno", reason: "(\(errno))" + String(cString: strerror(errno)))
