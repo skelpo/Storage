@@ -25,6 +25,9 @@ import Vapor
 ///
 ///     storage.store(file: Fail(data: Data(), name: "README.md"), at: "/Users/hackerman/projects/AwesomeProject")
 ///
+/// - Note: The `LocalStorage.store` method does _not_ create intermediate directories. The directory you create the file at
+///   must already exist or you will get a `StorageError.errno` error.
+///
 /// ## Getting a File
 ///
 /// The `LocalStorage.fetch(file:)` method uses a `NonBlockingFileIO` instance to stream the data from the file into a byte array.
