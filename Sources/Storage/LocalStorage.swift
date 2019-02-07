@@ -122,7 +122,10 @@ public struct LocalStorage: Storage, ServiceType {
             // The `O_EXCL` to make sure the file doesn't already exist.
             let fd = open(name, O_RDWR | O_TRUNC | O_CREAT | O_EXCL, 0o644)
             guard fd >= 0 else {
-                throw StorageError(identifier: "fdErr", reason: "Received error code \(fd) when creating the new file")
+                throw StorageError(
+                    identifier: "fdErr",
+                    reason: "Received error code \(fd) when creating the new file. Operation exited with \(errno)"
+                )
             }
             let handle = FileHandle(descriptor: fd)
             
