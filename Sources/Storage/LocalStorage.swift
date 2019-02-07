@@ -106,26 +106,22 @@ public struct LocalStorage: Storage, ServiceType {
         do {
             
             // Get the path that the file will be created at.
-            let path: String
-            if let unwrappedPath = optionalPath {
-                path = unwrappedPath
-            } else if let defaultPath = self.defaultPath {
-                path = defaultPath
-            } else {
+            let possibleUrl = (optionalPath ?? defaultPath).flatMap { URL(fileURLWithPath: $0) }
+            guard let containingUrl = possibleUrl else {
                 throw StorageError(identifier: "pathRequired", reason: "A path is required to store files locally")
             }
             
             // Create the path of the file to create
-            let name = path.last == "/" ? path + file.filename : path + "/" + file.filename
+            let name = containingUrl.appendingPathComponent(file.filename).path
             
             // Create a new file and a `FileHandle` instance from its descriptor.
-            // The `O_EXCL` to make sure the file doesn't already exist.
-            let fd = open(name, O_RDWR | O_TRUNC | O_CREAT | O_EXCL, 0o644)
+            // The `O_EXCL` flag makes sure the file doesn't already exist.
+            // The `O_CREAT` flag causes the file to be created since it doesn't exist.
+            // The `O_TRUNC` flag removes any data from the file.
+            // The `O_RDWR` flag opens thje file to be either written or read.
+            let fd = open(name, O_RDWR | O_TRUNC | O_CREAT | O_EXCL, S_IRWXU | S_IRGRP | S_IROTH)
             guard fd >= 0 else {
-                throw StorageError(
-                    identifier: "fdErr",
-                    reason: "Received error code \(fd) when creating the new file. Reveived errno \(errno)"
-                )
+                throw StorageError(identifier: "errno", reason: "(\(errno))" + String(cString: strerror(errno)))
             }
             let handle = FileHandle(descriptor: fd)
             
