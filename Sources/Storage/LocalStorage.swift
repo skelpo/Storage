@@ -124,7 +124,7 @@ public struct LocalStorage: Storage, ServiceType {
             guard fd >= 0 else {
                 throw StorageError(
                     identifier: "fdErr",
-                    reason: "Received error code \(fd) when creating the new file. Operation exited with \(errno)"
+                    reason: "Received error code \(fd) when creating the new file. Reveived errno \(errno)"
                 )
             }
             let handle = FileHandle(descriptor: fd)
