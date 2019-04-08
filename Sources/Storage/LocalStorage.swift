@@ -109,7 +109,7 @@ public struct LocalStorage: Storage, ServiceType {
         do {
             
             // Get the path that the file will be created at.
-            let possibleUrl = (optionalPath ?? defaultPath).flatMap { URL(fileURLWithPath: $0) }
+            let possibleUrl = (optionalPath ?? self.defaultPath).flatMap(URL.init(fileURLWithPath:))
             guard let containingUrl = possibleUrl else {
                 throw StorageError(identifier: "pathRequired", reason: "A path is required to store files locally")
             }
