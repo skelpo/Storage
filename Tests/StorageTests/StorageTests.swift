@@ -53,10 +53,17 @@ final class StorageTests: XCTestCase {
         let storage = try self.app.make(LocalStorage.self)
         let file = File(data: self.data, filename: "test.md")
         let path = try storage.store(file: file, at: self.path + "/Test Files").wait()
-        
         XCTAssertEqual(path, self.path + "/Test Files/" + file.filename)
-        
-        try FileManager.default.removeItem(atPath: self.path + "/Test Files")
+
+        let read = try storage.fetch(file: path).wait()
+        XCTAssertEqual(read.data, self.data)
+
+        let data = Data([10, 76, 97, 115, 116, 32, 76, 105, 110, 101, 32, 101, 110, 100, 115, 32, 104, 101, 114, 101, 46])
+        let update = try storage.write(file: path, with: data, options: []).wait()
+        XCTAssertEqual(update.filename, "test.md")
+        XCTAssertEqual(update.data, data)
+
+        try storage.delete(file: path).wait()
     }
     
     func testFetch()throws {
@@ -77,8 +84,7 @@ final class StorageTests: XCTestCase {
         let f = File(data: self.data, filename: "test.md")
         let path = try storage.store(file: f, at: self.path).wait()
         
-        let data = Data(bytes: [10, 76, 97, 115, 116, 32, 76, 105, 110, 101, 32, 101, 110, 100, 115, 32, 104, 101, 114, 101, 46])
-        
+        let data = Data([10, 76, 97, 115, 116, 32, 76, 105, 110, 101, 32, 101, 110, 100, 115, 32, 104, 101, 114, 101, 46])
         let update = try storage.write(file: path, with: data, options: []).wait()
         
         XCTAssertEqual(update.filename, "test.md")
