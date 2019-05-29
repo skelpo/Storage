@@ -109,7 +109,7 @@ public struct LocalStorage: Storage, ServiceType {
         do {
             
             // Get the path that the file will be created at.
-            let possibleUrl = (optionalPath ?? defaultPath).flatMap { URL(fileURLWithPath: $0) }
+            let possibleUrl = (optionalPath ?? self.defaultPath).flatMap(URL.init(fileURLWithPath:))
             guard let containingUrl = possibleUrl else {
                 throw StorageError(identifier: "pathRequired", reason: "A path is required to store files locally")
             }
@@ -192,14 +192,9 @@ public struct LocalStorage: Storage, ServiceType {
             // Make sure a file exists at the given path.
             try self.assert(path: file)
             
-            // Create the URL that the data will write to.
-            guard let url = URL(string: "file:" + file) else {
-                throw StorageError(identifier: "fileURL", reason: "Unable to create a file URL from path `\(file)`")
-            }
-            
             // Write the new data to the file on the currenct event loop.
             let write = self.threadPool.runIfActive(eventLoop: self.worker.eventLoop) {
-                return try data.write(to: url, options: options)
+                return try data.write(to: URL(fileURLWithPath: file), options: options)
             }
             
             // Read the updated file and return it.
