@@ -1,4 +1,5 @@
 import Vapor
+import NIO
 
 /// A `Storage` implementation that handles local file storage.
 ///
@@ -52,15 +53,10 @@ import Vapor
 /// The `localStorage.delete(file:)` method deletes an existing file by running the `FileManager.deleteItem` method in the `BlockingIOThraedPool`.
 ///
 ///     storage.delete(file:  "/Users/hackerman/projects/AwesomeProject")
-public struct LocalStorage: Storage, ServiceType {
-    
-    /// See `ServiceType.makeService(for:)`.
-    public static func makeService(for worker: Container) throws -> LocalStorage {
-        return try LocalStorage(worker: worker, pool: worker.make())
-    }
+public struct LocalStorage: Storage {
     
     /// The event loop group that the service lives on.
-    public let worker: Worker
+    public let eventLoop: EventLoop
     
     /// The default path to store files to if no path is passed in.
     public let defaultPath: String?
@@ -70,7 +66,7 @@ public struct LocalStorage: Storage, ServiceType {
     internal let manager: FileManager
     
     /// The thread pool used to asynchronously write to files. Also used to initialize the `NonBlockingFileIO` instance.
-    internal let threadPool: BlockingIOThreadPool
+    internal let threadPool: NIOThreadPool
     
     /// The file IO interface for creating and reading files.
     internal let io: NonBlockingFileIO
@@ -88,12 +84,12 @@ public struct LocalStorage: Storage, ServiceType {
     ///   - pool: The thread pool used to asyncronously write to files. Also used to initialize the `NonBlockingFileIO` instance.
     ///     Defaults to a thread pool with 2 threads.
     public init(
-        worker: Worker,
+        eventLoop: EventLoop,
         manager: FileManager = .default,
         defaultPath path: String? = nil,
-        pool: BlockingIOThreadPool = BlockingIOThreadPool(numberOfThreads: 2)
+        pool: NIOThreadPool = NIOThreadPool(numberOfThreads: 2)
     ) {
-        self.worker = worker
+        self.eventLoop = eventLoop
         self.manager = manager
         self.defaultPath = path
 
@@ -103,7 +99,17 @@ public struct LocalStorage: Storage, ServiceType {
         
         self.threadPool.start()
     }
-    
+
+    /// Creates a new `LocalStorage` instance from a service container.
+    ///
+    /// The `Container` used is expected to have a `NIOThreadPool` registered as one of it's services.
+    ///
+    /// - Parameter container: The `Container` to use the event loop from and to make the `NIOThreadPool`
+    ///   instance from to initialize with.
+    public init(container: Container)throws {
+        try self.init(eventLoop: container.eventLoop, pool: container.make())
+    }
+
     /// See `Storage.store(file:at:)`.
     public func store(file: File, at optionalPath: String? = nil) -> EventLoopFuture<String> {
         do {
@@ -126,18 +132,15 @@ public struct LocalStorage: Storage, ServiceType {
             guard fd >= 0 else {
                 throw StorageError(identifier: "errno", reason: "(\(errno))" + String(cString: strerror(errno)))
             }
-            let handle = FileHandle(descriptor: fd)
-            
-            // Create a `ByteBuffer` to stream the file data from.
-            var buffer = self.allocator.buffer(capacity: file.data.count)
-            buffer.write(bytes: file.data)
+            let handle = NIOFileHandle(descriptor: fd)
             
             // Stream the file data into the empty file.
-            return self.io.write(fileHandle: handle, buffer: buffer, eventLoop: self.worker.eventLoop).always {
+            let write = self.io.write(fileHandle: handle, buffer: file.data, eventLoop: self.eventLoop)
+            return write.always { _ in
                 try? handle.close()
             }.transform(to: name)
         } catch let error {
-            return self.worker.future(error: error)
+            return self.eventLoop.future(error: error)
         }
     }
     
@@ -156,8 +159,8 @@ public struct LocalStorage: Storage, ServiceType {
             guard let attributes = try? FileManager.default.attributesOfItem(atPath: file), let fileSize = attributes[.size] as? NSNumber else {
                 throw StorageError(identifier: "fileSize", reason: "Could not determine file size of file `\(file)`.")
             }
-            
-            let handle = try FileHandle(path: file)
+
+            let handle = try NIOFileHandle(path: file)
             var fileData = Data()
             fileData.reserveCapacity(fileSize.intValue)
             
@@ -167,22 +170,22 @@ public struct LocalStorage: Storage, ServiceType {
                 byteCount: fileSize.intValue,
                 chunkSize: NonBlockingFileIO.defaultChunkSize,
                 allocator: self.allocator,
-                eventLoop: self.worker.eventLoop
+                eventLoop: self.eventLoop
             ) { chunk in
                 chunk.withUnsafeReadableBytes { ptr in
                     fileData.append(ptr.bindMemory(to: UInt8.self))
                 }
                 
-                return self.worker.future()
-            }.map {
-                
-                // Return the file data (contents and name).
-                return File(data: fileData, filename: name)
-            }.always {
+                return self.eventLoop.future()
+            }.map { foo in
+                var buffer = self.allocator.buffer(capacity: fileData.count)
+                buffer.writeBytes(fileData)
+                return File(data: buffer, filename: name)
+            }.always { _ in
                 try? handle.close()
             }
         } catch let error {
-            return self.worker.future(error: error)
+            return self.eventLoop.future(error: error)
         }
     }
     
@@ -193,14 +196,14 @@ public struct LocalStorage: Storage, ServiceType {
             try self.assert(path: file)
             
             // Write the new data to the file on the currenct event loop.
-            let write = self.threadPool.runIfActive(eventLoop: self.worker.eventLoop) {
-                return try data.write(to: URL(fileURLWithPath: file), options: options)
+            let write = self.threadPool.runIfActive(eventLoop: self.eventLoop) {
+                return try data.write(to: URL(fileURLWithPath: file), options: [])
             }
             
             // Read the updated file and return it.
             return write.flatMap { self.fetch(file: file) }
         } catch let error {
-            return self.worker.future(error: error)
+            return self.eventLoop.future(error: error)
         }
     }
     
@@ -211,11 +214,11 @@ public struct LocalStorage: Storage, ServiceType {
             try self.assert(path: file)
             
             // Asynchronously
-            return self.threadPool.runIfActive(eventLoop: self.worker.eventLoop) {
+            return self.threadPool.runIfActive(eventLoop: self.eventLoop) {
                 return try self.manager.removeItem(atPath: file)
             }
         } catch let error {
-            return self.worker.future(error: error)
+            return self.eventLoop.future(error: error)
         }
     }
     
