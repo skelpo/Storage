@@ -22,7 +22,7 @@ It requires 4 methods:
 
 - `func store(file: File, at path: String?) -> EventLoopFuture<String>`
 - `func fetch(file: String) -> EventLoopFuture<File>`
-- `func write(file: String, with data: Data, options: Data.WritingOptions) -> EventLoopFuture<File>`
+- `func write(file: String, with data: Data) -> EventLoopFuture<File>`
 - `func delete(file: String) -> EventLoopFuture<Void>`
 
 

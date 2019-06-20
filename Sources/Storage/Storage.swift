@@ -29,7 +29,7 @@ public protocol Storage {
     ///   - options: Options to modify how the file is written to. Not all options will be suppoorted by all platforms.
     ///
     /// - Returns: The updated file information, wrapped in a future.
-    func write(file: String, with data: Data, options: Data.WritingOptions) -> EventLoopFuture<File>
+    func write(file: String, with data: Data) -> EventLoopFuture<File>
     
     /// Deletes a file.
     ///

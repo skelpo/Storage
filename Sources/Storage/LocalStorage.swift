@@ -187,7 +187,7 @@ public struct LocalStorage: Storage, ServiceType {
     }
     
     /// See `Storage.write(file:data:options:)`.
-    public func write(file: String, with data: Data, options: Data.WritingOptions = []) -> EventLoopFuture<File> {
+    public func write(file: String, with data: Data) -> EventLoopFuture<File> {
         do {
             // Make sure a file exists at the given path.
             try self.assert(path: file)
