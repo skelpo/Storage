@@ -131,12 +131,4 @@ final class StorageTests: XCTestCase {
         
         try XCTAssertNoThrow(storage.delete(file: path).wait())
     }
-    
-    static var allTests: [(String, (StorageTests) -> ()throws -> ())] = [
-        ("testStore", testStore),
-        ("testPathWithWhitespace", testPathWithWhitespace),
-        ("testFetch", testFetch),
-        ("testWrite", testWrite),
-        ("testDelete", testDelete)
-    ]
 }

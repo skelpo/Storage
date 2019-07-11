@@ -3,5 +3,6 @@ import XCTest
 import StorageTests
 
 var tests = [XCTestCaseEntry]()
-tests += StorageTests.allTests()
+tests += StorageTests.__allTests()
+
 XCTMain(tests)
