@@ -27,7 +27,6 @@ public protocol Storage {
     /// - Parameters:
     ///   - file: The path or URL of the file to write to.
     ///   - data: The new data to write to the file.
-    ///   - options: Options to modify how the file is written to. Not all options will be suppoorted by all platforms.
     ///
     /// - Returns: The updated file information, wrapped in a future.
     func write(file: String, with data: Data) -> EventLoopFuture<File>
