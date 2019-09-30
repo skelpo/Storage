@@ -1,7 +1,7 @@
 import Foundation
 import NIO
 
-/// A type that can store and fetch resources using an underlying API, such as Google Cloud Storage of Foundation's `FileManager`.
+/// A type that can store and fetch resources using an underlying API, such as Google Cloud Storage or Foundation's `FileManager`.
 public protocol Storage {
     
     /// Stores a new file at a given path.
