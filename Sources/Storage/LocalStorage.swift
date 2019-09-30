@@ -5,16 +5,12 @@ import NIO
 ///
 /// ## Initializing
 ///
-/// `LocalStorage` conforms to the `ServiceType` protocol, so you can simply register it with your services and access it from a container:
+/// The initializer for `LocalStorage` requires you to pass in a SwiftNIO `EventLoop`, but you can also pass in a custom `FileManager`,
+/// a default storage path, and a custom thread pool to run the operations on.
 ///
-///     services.register(LocalStorage.self)
-///     try container.make(LocalStorage.self)
+///     let storage = LocalStorage(eventLoop: eventLoop, manager: FileManager.default, defaultPath: nil, pool: BlockingIOThreadPool(numberOfThreads: 2))
 ///
-/// There is also a public initializer you can use if you want to use it without a `Container` instance or customize some of its properties:
-///
-///     let storage = LocalStorage(worker: eventLoopGroup, manager: FileManager.default, defaultPath: nil, pool: BlockingIOThreadPool(numberOfThreads: 2))
-///
-/// Only the `worker` parameter is required. All others have a default value.
+/// Only the `eventLoop` parameter is required. All others have a default value.
 ///
 /// ## Creating New Files
 ///

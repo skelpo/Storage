@@ -109,16 +109,12 @@
                         <p>A <code><a href="Protocols/Storage.html">Storage</a></code> implementation that handles local file storage.</p>
 <h2 id='initializing' class='heading'>Initializing</h2>
 
-<p><code>LocalStorage</code> conforms to the <code>ServiceType</code> protocol, so you can simply register it with your services and access it from a container:</p>
-<pre class="highlight swift"><code><span class="n">services</span><span class="o">.</span><span class="nf">register</span><span class="p">(</span><span class="kt">LocalStorage</span><span class="o">.</span><span class="k">self</span><span class="p">)</span>
-<span class="k">try</span> <span class="n">container</span><span class="o">.</span><span class="nf">make</span><span class="p">(</span><span class="kt">LocalStorage</span><span class="o">.</span><span class="k">self</span><span class="p">)</span>
+<p>The initializer for <code>LocalStorage</code> requires you to pass in a SwiftNIO <code>EventLoop</code>, but you can also pass in a custom <code>FileManager</code>,
+a default storage path, and a custom thread pool to run the operations on.</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">storage</span> <span class="o">=</span> <span class="kt">LocalStorage</span><span class="p">(</span><span class="nv">eventLoop</span><span class="p">:</span> <span class="n">eventLoop</span><span class="p">,</span> <span class="nv">manager</span><span class="p">:</span> <span class="kt">FileManager</span><span class="o">.</span><span class="k">default</span><span class="p">,</span> <span class="n">defaultPath</span><span class="p">:</span> <span class="kc">nil</span><span class="p">,</span> <span class="nv">pool</span><span class="p">:</span> <span class="kt">BlockingIOThreadPool</span><span class="p">(</span><span class="nv">numberOfThreads</span><span class="p">:</span> <span class="mi">2</span><span class="p">))</span>
 </code></pre>
 
-<p>There is also a public initializer you can use if you want to use it without a <code>Container</code> instance or customize some of its properties:</p>
-<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">storage</span> <span class="o">=</span> <span class="kt">LocalStorage</span><span class="p">(</span><span class="nv">worker</span><span class="p">:</span> <span class="n">eventLoopGroup</span><span class="p">,</span> <span class="nv">manager</span><span class="p">:</span> <span class="kt">FileManager</span><span class="o">.</span><span class="k">default</span><span class="p">,</span> <span class="n">defaultPath</span><span class="p">:</span> <span class="kc">nil</span><span class="p">,</span> <span class="nv">pool</span><span class="p">:</span> <span class="kt">BlockingIOThreadPool</span><span class="p">(</span><span class="nv">numberOfThreads</span><span class="p">:</span> <span class="mi">2</span><span class="p">))</span>
-</code></pre>
-
-<p>Only the <code>worker</code> parameter is required. All others have a default value.</p>
+<p>Only the <code>eventLoop</code> parameter is required. All others have a default value.</p>
 <h2 id='creating-new-files' class='heading'>Creating New Files</h2>
 
 <p>The <code><a href="Structs/LocalStorage.html#/s:7Storage05LocalA0V5store4file2at3NIO15EventLoopFutureCySSGAA4FileV_SSSgtF">LocalStorage.store(file:at:)</a></code> method creats a new file at a given path with the <code>file.data</code> value as its contents.
