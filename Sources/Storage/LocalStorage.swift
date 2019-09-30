@@ -1,4 +1,4 @@
-import Vapor
+import Foundation
 import NIO
 
 /// A `Storage` implementation that handles local file storage.
@@ -100,16 +100,6 @@ public struct LocalStorage: Storage {
         self.threadPool.start()
     }
 
-    /// Creates a new `LocalStorage` instance from a service container.
-    ///
-    /// The `Container` used is expected to have a `NIOThreadPool` registered as one of it's services.
-    ///
-    /// - Parameter container: The `Container` to use the event loop from and to make the `NIOThreadPool`
-    ///   instance from to initialize with.
-    public init(container: Container)throws {
-        try self.init(eventLoop: container.eventLoop, pool: container.make())
-    }
-
     /// See `Storage.store(file:at:)`.
     public func store(file: File, at optionalPath: String? = nil) -> EventLoopFuture<String> {
         do {
@@ -135,12 +125,12 @@ public struct LocalStorage: Storage {
             let handle = NIOFileHandle(descriptor: fd)
             
             // Stream the file data into the empty file.
-            let write = self.io.write(fileHandle: handle, buffer: file.data, eventLoop: self.eventLoop)
+            let write = self.io.write(fileHandle: handle, buffer: file.buffer, eventLoop: self.eventLoop)
             return write.always { _ in
                 try? handle.close()
-            }.transform(to: name)
+            }.map { name }
         } catch let error {
-            return self.eventLoop.future(error: error)
+            return self.eventLoop.makeFailedFuture(error)
         }
     }
     
@@ -176,16 +166,16 @@ public struct LocalStorage: Storage {
                     fileData.append(ptr.bindMemory(to: UInt8.self))
                 }
                 
-                return self.eventLoop.future()
-            }.map { foo in
+                return self.eventLoop.makeSucceededFuture(())
+            }.map {
                 var buffer = self.allocator.buffer(capacity: fileData.count)
                 buffer.writeBytes(fileData)
-                return File(data: buffer, filename: name)
+                return File(buffer: buffer, filename: name)
             }.always { _ in
                 try? handle.close()
             }
         } catch let error {
-            return self.eventLoop.future(error: error)
+            return self.eventLoop.makeFailedFuture(error)
         }
     }
     
@@ -203,7 +193,7 @@ public struct LocalStorage: Storage {
             // Read the updated file and return it.
             return write.flatMap { self.fetch(file: file) }
         } catch let error {
-            return self.eventLoop.future(error: error)
+            return self.eventLoop.makeFailedFuture(error)
         }
     }
     
@@ -218,7 +208,7 @@ public struct LocalStorage: Storage {
                 return try self.manager.removeItem(atPath: file)
             }
         } catch let error {
-            return self.eventLoop.future(error: error)
+            return self.eventLoop.makeFailedFuture(error)
         }
     }
     

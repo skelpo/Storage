@@ -1,13 +1,13 @@
+import NIO
 import XCTest
-import Vapor
 @testable import Storage
 
 final class StorageTests: XCTestCase {
-    let app: Application = {
-        return Application(environment: .testing, configure: { services in
-            services.register(LocalStorage.self, LocalStorage.init(container:))
-        })
-    }()
+    let path = FileManager.default.currentDirectoryPath
+
+    var eventLoopGroup: EventLoopGroup! = nil
+    var storage: Storage! = nil
+
 
     let buffer: ByteBuffer = {
         let data = """
@@ -50,16 +50,32 @@ final class StorageTests: XCTestCase {
         return buffer
     }()
 
-    let path = FileManager.default.currentDirectoryPath
-    
-    func testStore()throws {
-        let container = try self.app.makeContainer().wait()
-        defer { container.shutdown() }
 
-        let storage = try container.make(LocalStorage.self)
-        let file = File(data: self.buffer, filename: "test.md")
+    override func setUp() {
+        super.setUp()
+
+        self.eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+        self.storage = LocalStorage(eventLoop: self.eventLoopGroup.next())
+    }
+
+    override func tearDown() {
+        do {
+            try self.eventLoopGroup.syncShutdownGracefully()
+        } catch let error {
+            print("ELG SHUTDOWN FAILED: ", error)
+        }
+
+        self.storage = nil
+        self.eventLoopGroup = nil
+
+        super.tearDown()
+    }
+
+
+    func testStore()throws {
+        let file = File(buffer: self.buffer, filename: "test.md")
         
-        let path = try storage.store(file: file, at: self.path).wait()
+        let path = try self.storage.store(file: file, at: self.path).wait()
         
         XCTAssertEqual(path, self.path + "/" + file.filename)
         
@@ -68,66 +84,50 @@ final class StorageTests: XCTestCase {
     
     func testPathWithWhitespace()throws {
         try FileManager.default.createDirectory(atPath: self.path + "/Test Files", withIntermediateDirectories: false, attributes: nil)
-        
-        let container = try self.app.makeContainer().wait()
-        defer { container.shutdown() }
 
-        let storage = try container.make(LocalStorage.self)
-        let file = File(data: self.buffer, filename: "test.md")
-        let path = try storage.store(file: file, at: self.path + "/Test Files").wait()
+        let file = File(buffer: self.buffer, filename: "test.md")
+        let path = try self.storage.store(file: file, at: self.path + "/Test Files").wait()
         XCTAssertEqual(path, self.path + "/Test Files/" + file.filename)
 
         let read = try storage.fetch(file: path).wait()
-        XCTAssertEqual(read.data, self.buffer)
+        XCTAssertEqual(read.buffer, self.buffer)
 
         let data = Data([10, 76, 97, 115, 116, 32, 76, 105, 110, 101, 32, 101, 110, 100, 115, 32, 104, 101, 114, 101, 46])
-        let update = try storage.write(file: path, with: data).wait()
+        let update = try self.storage.write(file: path, with: data).wait()
         XCTAssertEqual(update.filename, "test.md")
-        XCTAssertEqual(update.data, self.smallBuffer)
+        XCTAssertEqual(update.buffer, self.smallBuffer)
 
         try storage.delete(file: path).wait()
     }
     
     func testFetch()throws {
-        let container = try self.app.makeContainer().wait()
-        defer { container.shutdown() }
-
-        let storage = try container.make(LocalStorage.self)
-        let f = File(data: self.buffer, filename: "test.md")
-        let path = try storage.store(file: f, at: self.path).wait()
+        let f = File(buffer: self.buffer, filename: "test.md")
+        let path = try self.storage.store(file: f, at: self.path).wait()
         
-        let file = try storage.fetch(file: path).wait()
+        let file = try self.storage.fetch(file: path).wait()
 
-        XCTAssertEqual(file.data, self.buffer)
+        XCTAssertEqual(file.buffer, self.buffer)
         XCTAssertEqual(file.filename, "test.md")
         
         try FileManager.default.removeItem(atPath: path)
     }
     
     func testWrite()throws {
-        let container = try self.app.makeContainer().wait()
-        defer { container.shutdown() }
-
-        let storage = try container.make(LocalStorage.self)
-        let f = File(data: self.buffer, filename: "test.md")
+        let f = File(buffer: self.buffer, filename: "test.md")
         let path = try storage.store(file: f, at: self.path).wait()
         
         let data = Data([10, 76, 97, 115, 116, 32, 76, 105, 110, 101, 32, 101, 110, 100, 115, 32, 104, 101, 114, 101, 46])
         let update = try storage.write(file: path, with: data).wait()
         
         XCTAssertEqual(update.filename, "test.md")
-        XCTAssertEqual(update.data, self.smallBuffer)
+        XCTAssertEqual(update.buffer, self.smallBuffer)
         
         try FileManager.default.removeItem(atPath: path)
     }
     
     func testDelete()throws {
-        let container = try self.app.makeContainer().wait()
-        defer { container.shutdown() }
-
-        let storage = try container.make(LocalStorage.self)
-        let f = File(data: self.buffer, filename: "test.md")
-        let path = try storage.store(file: f, at: self.path).wait()
+        let f = File(buffer: self.buffer, filename: "test.md")
+        let path = try self.storage.store(file: f, at: self.path).wait()
         
         try XCTAssertNoThrow(storage.delete(file: path).wait())
     }
