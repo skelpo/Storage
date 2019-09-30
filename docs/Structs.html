@@ -10,6 +10,7 @@
     
   </head>
   <body>
+    <a name="//apple_ref/swift/Section/Structures" class="dashAnchor"></a>
     <a title="Structures  Reference"></a>
     <header>
       <div class="content-wrapper">
@@ -38,6 +39,9 @@
             <a href="Structs.html">Structures</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a href="Structs/File.html">File</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="Structs/LocalStorage.html">LocalStorage</a>
               </li>
               <li class="nav-group-task">
@@ -55,6 +59,38 @@
 
           </section>
           <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:7Storage4FileV"></a>
+                    <a name="//apple_ref/swift/Struct/File" class="dashAnchor"></a>
+                    <a class="token" href="#/s:7Storage4FileV">File</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Represents a single file.</p>
+
+                        <a href="Structs/File.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">File</span> <span class="p">:</span> <span class="kt">Codable</span><span class="p">,</span> <span class="kt">Equatable</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
             <div class="task-group">
               <ul>
                 <li class="item">
@@ -85,7 +121,7 @@
 <p>Only the <code>worker</code> parameter is required. All others have a default value.</p>
 <h2 id='creating-new-files' class='heading'>Creating New Files</h2>
 
-<p>The <code><a href="Structs/LocalStorage.html#/s:7Storage05LocalA0V5store4file2at3NIO15EventLoopFutureCySSG4Core4FileV_SSSgtF">LocalStorage.store(file:at:)</a></code> method creats a new file at a given path with the <code>file.data</code> value as its contents.
+<p>The <code><a href="Structs/LocalStorage.html#/s:7Storage05LocalA0V5store4file2at3NIO15EventLoopFutureCySSGAA4FileV_SSSgtF">LocalStorage.store(file:at:)</a></code> method creats a new file at a given path with the <code>file.data</code> value as its contents.
 If the <code><a href="Structs/LocalStorage.html#/s:7Storage05LocalA0V11defaultPathSSSgvp">LocalStorage.defaultPath</a></code> property is not <code>nil</code>, you can pass <code>nil</code> into the <code>path</code> parameter
 and the file will be stored at the default path. If there is no <code>path</code> or <code>defaultPath</code>, the <code>StorageError.pathRequired</code> error will be thrown.</p>
 
@@ -100,8 +136,8 @@ must already exist or you will get a <code>StorageError.errno</code> error.
 </div>
 <h2 id='getting-a-file' class='heading'>Getting a File</h2>
 
-<p>The <code><a href="Structs/LocalStorage.html#/s:7Storage05LocalA0V5fetch4file3NIO15EventLoopFutureCy4Core4FileVGSS_tF">LocalStorage.fetch(file:)</a></code> method uses a <code>NonBlockingFileIO</code> instance to stream the data from the file into a byte array.
-When all the bytes are fetched, they are used to create the <code>File</code> instance that is returned.</p>
+<p>The <code><a href="Structs/LocalStorage.html#/s:7Storage05LocalA0V5fetch4file3NIO15EventLoopFutureCyAA4FileVGSS_tF">LocalStorage.fetch(file:)</a></code> method uses a <code>NonBlockingFileIO</code> instance to stream the data from the file into a byte array.
+When all the bytes are fetched, they are used to create the <code><a href="Structs/File.html">File</a></code> instance that is returned.</p>
 
 <p>The name of the file returned is the last element of the <code>file</code> string passed in when it is split at the forward slash characters (<code>/</code>).</p>
 <pre class="highlight swift"><code><span class="n">storage</span><span class="o">.</span><span class="nf">fetch</span><span class="p">(</span><span class="nv">file</span><span class="p">:</span> <span class="s">"/Users/hackerman/projects/AwesomeProject/README.md"</span><span class="p">)</span>
@@ -112,7 +148,7 @@ When all the bytes are fetched, they are used to create the <code>File</code> in
 This allows you to customize how to writing happens using the <code>options</code> paramater. The operation is run on the worker&rsquo;s event loop using
 the <code>BlockingIOThreadPool</code> instance.</p>
 
-<p>When the write completes, <code><a href="Structs/LocalStorage.html#/s:7Storage05LocalA0V5fetch4file3NIO15EventLoopFutureCy4Core4FileVGSS_tF">LocalStorage.fetch(file:)</a></code> is called to get the updated file and return it.</p>
+<p>When the write completes, <code><a href="Structs/LocalStorage.html#/s:7Storage05LocalA0V5fetch4file3NIO15EventLoopFutureCyAA4FileVGSS_tF">LocalStorage.fetch(file:)</a></code> is called to get the updated file and return it.</p>
 <pre class="highlight swift"><code><span class="n">storage</span><span class="o">.</span><span class="nf">write</span><span class="p">(</span><span class="nv">file</span><span class="p">:</span> <span class="s">"/Users/hackerman/projects/AwesomeProject"</span><span class="p">,</span> <span class="nv">with</span><span class="p">:</span> <span class="kt">Data</span><span class="p">(),</span> <span class="nv">options</span><span class="p">:</span> <span class="p">[</span><span class="o">.</span><span class="n">withoutOverwriting</span><span class="p">])</span>
 </code></pre>
 <h2 id='deleteing-a-file' class='heading'>Deleteing a File</h2>
@@ -127,7 +163,7 @@ the <code>BlockingIOThreadPool</code> instance.</p>
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">LocalStorage</span><span class="p">:</span> <span class="kt"><a href="Protocols/Storage.html">Storage</a></span><span class="p">,</span> <span class="kt">ServiceType</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">LocalStorage</span> <span class="p">:</span> <span class="kt"><a href="Protocols/Storage.html">Storage</a></span></code></pre>
 
                         </div>
                       </div>
@@ -159,7 +195,7 @@ the <code>BlockingIOThreadPool</code> instance.</p>
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">StorageError</span><span class="p">:</span> <span class="kt">Debuggable</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">StorageError</span> <span class="p">:</span> <span class="kt">Error</span></code></pre>
 
                         </div>
                       </div>
@@ -171,8 +207,8 @@ the <code>BlockingIOThreadPool</code> instance.</p>
           </section>
         </section>
         <section id="footer">
-          <p>&copy; 2019 <a class="link" href="" target="_blank" rel="external"></a>. All rights reserved. (Last updated: 2019-02-07)</p>
-          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.9.1</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+          <p>&copy; 2019 <a class="link" href="" target="_blank" rel="external"></a>. All rights reserved. (Last updated: 2019-09-30)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.11.2</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
         </section>
       </article>
     </div>
