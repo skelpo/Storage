@@ -37,8 +37,6 @@ If any error occurs in the `Storage` methods, a `StorageError` is returned in th
 
 A `Storage` implementation for interacting with files in your local file system. The `store` and `fetch` methods stream the file data, while the `delete` and `write` methods are run on the instance's event loop.
 
-`LocalStorage` conforms to `ServiceType`, so you can register it with the rest of your app's services.
-
 ## Documentation
 
 You can see the API documentation [here](http://www.skelpo.codes/Storage).
