@@ -81,7 +81,7 @@ If the <code><a href="../Structs/LocalStorage.html#/s:7Storage05LocalA0V11defaul
 and the file will be stored at the default path. If there is no <code>path</code> or <code>defaultPath</code>, the <code>StorageError.pathRequired</code> error will be thrown.</p>
 
 <p>The path the file is stored at will be <code>path</code> + <code>file.name</code>. The <code>.store</code> method will handle forward slashes in the path.</p>
-<pre class="highlight swift"><code><span class="n">storage</span><span class="o">.</span><span class="nf">store</span><span class="p">(</span><span class="nv">file</span><span class="p">:</span> <span class="kt">Fail</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="kt">Data</span><span class="p">(),</span> <span class="nv">name</span><span class="p">:</span> <span class="s">"README.md"</span><span class="p">),</span> <span class="nv">at</span><span class="p">:</span> <span class="s">"/Users/hackerman/projects/AwesomeProject"</span><span class="p">)</span>
+<pre class="highlight swift"><code><span class="n">storage</span><span class="o">.</span><span class="nf">store</span><span class="p">(</span><span class="nv">file</span><span class="p">:</span> <span class="kt">File</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="kt">Data</span><span class="p">(),</span> <span class="nv">name</span><span class="p">:</span> <span class="s">"README.md"</span><span class="p">),</span> <span class="nv">at</span><span class="p">:</span> <span class="s">"/Users/hackerman/projects/AwesomeProject"</span><span class="p">)</span>
 </code></pre>
 <div class="aside aside-note">
     <p class="aside-title">Note</p>
@@ -108,7 +108,7 @@ the <code>BlockingIOThreadPool</code> instance.</p>
 </code></pre>
 <h2 id='deleteing-a-file' class='heading'>Deleteing a File</h2>
 
-<p>The <code>localStorage.delete(file:)</code> method deletes an existing file by running the <code>FileManager.deleteItem</code> method in the <code>BlockingIOThraedPool</code>.</p>
+<p>The <code>localStorage.delete(file:)</code> method deletes an existing file by running the <code>FileManager.deleteItem</code> method in the <code>BlockingIOThreadPool</code>.</p>
 <pre class="highlight swift"><code><span class="n">storage</span><span class="o">.</span><span class="nf">delete</span><span class="p">(</span><span class="nv">file</span><span class="p">:</span>  <span class="s">"/Users/hackerman/projects/AwesomeProject"</span><span class="p">)</span>
 </code></pre>
 

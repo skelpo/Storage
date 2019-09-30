@@ -24,7 +24,7 @@ import NIO
 ///
 /// The path the file is stored at will be `path` + `file.name`. The `.store` method will handle forward slashes in the path.
 ///
-///     storage.store(file: Fail(data: Data(), name: "README.md"), at: "/Users/hackerman/projects/AwesomeProject")
+///     storage.store(file: File(data: Data(), name: "README.md"), at: "/Users/hackerman/projects/AwesomeProject")
 ///
 /// - Note: The `LocalStorage.store` method does _not_ create intermediate directories. The directory you create the file at
 ///   must already exist or you will get a `StorageError.errno` error.
@@ -50,7 +50,7 @@ import NIO
 ///
 /// ## Deleteing a File
 ///
-/// The `localStorage.delete(file:)` method deletes an existing file by running the `FileManager.deleteItem` method in the `BlockingIOThraedPool`.
+/// The `localStorage.delete(file:)` method deletes an existing file by running the `FileManager.deleteItem` method in the `BlockingIOThreadPool`.
 ///
 ///     storage.delete(file:  "/Users/hackerman/projects/AwesomeProject")
 public struct LocalStorage: Storage {
