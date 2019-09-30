@@ -25,6 +25,9 @@ It requires 4 methods:
 - `func write(file: String, with data: Data) -> EventLoopFuture<File>`
 - `func delete(file: String) -> EventLoopFuture<Void>`
 
+### `File`
+
+A Swift type that represents file with a name `String` and the contents as `ByteBuffer`.
 
 ### `StorageError`
 
