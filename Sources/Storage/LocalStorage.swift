@@ -36,13 +36,12 @@ import NIO
 ///
 /// ## Updating a File
 ///
-/// The `LocalStorage.write(file:data:options:)` method writes to the specified file using the `Data.write(to:options:)` method.
-/// This allows you to customize how to writing happens using the `options` paramater. The operation is run on the worker's event loop using
-/// the `BlockingIOThreadPool` instance.
+/// The `LocalStorage.write(file:data)` method writes to the specified file using the `Data.write(to:options:)` method, passing in an empty option set.
+/// The operation is run on the worker's event loop using the `BlockingIOThreadPool` instance.
 ///
 /// When the write completes, `LocalStorage.fetch(file:)` is called to get the updated file and return it.
 ///
-///     storage.write(file: "/Users/hackerman/projects/AwesomeProject", with: Data(), options: [.withoutOverwriting])
+///     storage.write(file: "/Users/hackerman/projects/AwesomeProject", with: Data())
 ///
 /// ## Deleteing a File
 ///

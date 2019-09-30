@@ -140,12 +140,11 @@ When all the bytes are fetched, they are used to create the <code><a href="Struc
 </code></pre>
 <h2 id='updating-a-file' class='heading'>Updating a File</h2>
 
-<p>The <code>LocalStorage.write(file:data:options:)</code> method writes to the specified file using the <code>Data.write(to:options:)</code> method.
-This allows you to customize how to writing happens using the <code>options</code> paramater. The operation is run on the worker&rsquo;s event loop using
-the <code>BlockingIOThreadPool</code> instance.</p>
+<p>The <code>LocalStorage.write(file:data)</code> method writes to the specified file using the <code>Data.write(to:options:)</code> method, passing in an empty option set.
+The operation is run on the worker&rsquo;s event loop using the <code>BlockingIOThreadPool</code> instance.</p>
 
 <p>When the write completes, <code><a href="Structs/LocalStorage.html#/s:7Storage05LocalA0V5fetch4file3NIO15EventLoopFutureCyAA4FileVGSS_tF">LocalStorage.fetch(file:)</a></code> is called to get the updated file and return it.</p>
-<pre class="highlight swift"><code><span class="n">storage</span><span class="o">.</span><span class="nf">write</span><span class="p">(</span><span class="nv">file</span><span class="p">:</span> <span class="s">"/Users/hackerman/projects/AwesomeProject"</span><span class="p">,</span> <span class="nv">with</span><span class="p">:</span> <span class="kt">Data</span><span class="p">(),</span> <span class="nv">options</span><span class="p">:</span> <span class="p">[</span><span class="o">.</span><span class="n">withoutOverwriting</span><span class="p">])</span>
+<pre class="highlight swift"><code><span class="n">storage</span><span class="o">.</span><span class="nf">write</span><span class="p">(</span><span class="nv">file</span><span class="p">:</span> <span class="s">"/Users/hackerman/projects/AwesomeProject"</span><span class="p">,</span> <span class="nv">with</span><span class="p">:</span> <span class="kt">Data</span><span class="p">())</span>
 </code></pre>
 <h2 id='deleteing-a-file' class='heading'>Deleteing a File</h2>
 
