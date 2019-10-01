@@ -22,9 +22,12 @@ It requires 4 methods:
 
 - `func store(file: File, at path: String?) -> EventLoopFuture<String>`
 - `func fetch(file: String) -> EventLoopFuture<File>`
-- `func write(file: String, with data: Data, options: Data.WritingOptions) -> EventLoopFuture<File>`
+- `func write(file: String, with data: Data) -> EventLoopFuture<File>`
 - `func delete(file: String) -> EventLoopFuture<Void>`
 
+### `File`
+
+A Swift type that represents file with a name `String` and the contents as `ByteBuffer`.
 
 ### `StorageError`
 
@@ -33,8 +36,6 @@ If any error occurs in the `Storage` methods, a `StorageError` is returned in th
 ### `LocalStorage`
 
 A `Storage` implementation for interacting with files in your local file system. The `store` and `fetch` methods stream the file data, while the `delete` and `write` methods are run on the instance's event loop.
-
-`LocalStorage` conforms to `ServiceType`, so you can register it with the rest of your app's services.
 
 ## Documentation
 

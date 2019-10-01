@@ -1,6 +1,7 @@
-import Vapor
+import Foundation
+import NIO
 
-/// A type that can store and fetch resources using an underlying API, such as Google Cloud Storage of Foundation's `FileManager`.
+/// A type that can store and fetch resources using an underlying API, such as Google Cloud Storage or Foundation's `FileManager`.
 public protocol Storage {
     
     /// Stores a new file at a given path.
@@ -26,10 +27,9 @@ public protocol Storage {
     /// - Parameters:
     ///   - file: The path or URL of the file to write to.
     ///   - data: The new data to write to the file.
-    ///   - options: Options to modify how the file is written to. Not all options will be suppoorted by all platforms.
     ///
     /// - Returns: The updated file information, wrapped in a future.
-    func write(file: String, with data: Data, options: Data.WritingOptions) -> EventLoopFuture<File>
+    func write(file: String, with data: Data) -> EventLoopFuture<File>
     
     /// Deletes a file.
     ///

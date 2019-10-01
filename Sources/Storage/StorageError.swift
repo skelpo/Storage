@@ -1,7 +1,5 @@
-import Core
-
 /// The error type that is thrown when a storage operation fails.
-public struct StorageError: Debuggable {
+public struct StorageError: Error {
     
     /// A unique, machine readable, identifier for this error.
     public var identifier: String
